@@ -1,0 +1,1771 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Defect Calculations in MgO | Md. Mohiuddin | University of Dhaka</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg:        #0a0e14;
+  --surface:   #111720;
+  --surface2:  #1a2333;
+  --border:    #1e2d42;
+  --accent:    #38bdf8;
+  --accent2:   #818cf8;
+  --accent3:   #34d399;
+  --warn:      #fb923c;
+  --danger:    #f87171;
+  --text:      #e2e8f0;
+  --muted:     #64748b;
+  --code-bg:   #0d1520;
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+html{scroll-behavior:smooth;}
+body{
+  background:var(--bg);
+  color:var(--text);
+  font-family:'DM Sans',sans-serif;
+  font-size:15px;
+  line-height:1.7;
+  overflow-x:hidden;
+}
+
+/* ── GRID BACKGROUND ── */
+body::before{
+  content:'';
+  position:fixed;inset:0;
+  background-image:
+    linear-gradient(var(--border) 1px, transparent 1px),
+    linear-gradient(90deg, var(--border) 1px, transparent 1px);
+  background-size:40px 40px;
+  opacity:0.25;
+  pointer-events:none;
+  z-index:0;
+}
+
+/* ── NAV ── */
+nav{
+  position:fixed;top:0;left:0;right:0;
+  z-index:100;
+  background:rgba(10,14,20,0.92);
+  backdrop-filter:blur(12px);
+  border-bottom:1px solid var(--border);
+  display:flex;align-items:center;justify-content:space-between;
+  padding:0 2rem;
+  height:56px;
+}
+.nav-brand{
+  font-family:'IBM Plex Mono',monospace;
+  font-size:13px;
+  color:var(--accent);
+  letter-spacing:0.05em;
+}
+.nav-links{
+  display:flex;gap:0.25rem;list-style:none;
+}
+.nav-links a{
+  font-family:'IBM Plex Mono',monospace;
+  font-size:11px;
+  color:var(--muted);
+  text-decoration:none;
+  padding:0.35rem 0.75rem;
+  border-radius:4px;
+  letter-spacing:0.04em;
+  transition:all 0.2s;
+}
+.nav-links a:hover{color:var(--accent);background:rgba(56,189,248,0.08);}
+
+/* ── HERO ── */
+.hero{
+  position:relative;
+  min-height:100vh;
+  display:flex;align-items:center;justify-content:center;
+  padding:6rem 2rem 4rem;
+  z-index:1;
+  overflow:hidden;
+}
+.hero-glow{
+  position:absolute;
+  width:600px;height:600px;
+  background:radial-gradient(circle, rgba(56,189,248,0.08) 0%, transparent 70%);
+  top:50%;left:50%;transform:translate(-50%,-50%);
+  pointer-events:none;
+}
+.hero-inner{max-width:860px;text-align:center;}
+.hero-badge{
+  display:inline-flex;align-items:center;gap:0.5rem;
+  font-family:'IBM Plex Mono',monospace;
+  font-size:11px;
+  color:var(--accent);
+  background:rgba(56,189,248,0.08);
+  border:1px solid rgba(56,189,248,0.2);
+  border-radius:100px;
+  padding:0.35rem 1rem;
+  margin-bottom:2rem;
+  letter-spacing:0.08em;
+}
+.hero-badge::before{content:'●';font-size:8px;animation:pulse 2s infinite;}
+@keyframes pulse{0%,100%{opacity:1;}50%{opacity:0.3;}}
+h1.hero-title{
+  font-family:'DM Serif Display',serif;
+  font-size:clamp(2.4rem, 6vw, 4.2rem);
+  line-height:1.1;
+  margin-bottom:1.5rem;
+  background:linear-gradient(135deg, #e2e8f0 0%, var(--accent) 50%, var(--accent2) 100%);
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;
+  background-clip:text;
+}
+.hero-sub{
+  font-size:1.05rem;
+  color:var(--muted);
+  max-width:600px;
+  margin:0 auto 2.5rem;
+  line-height:1.8;
+}
+.hero-meta{
+  font-family:'IBM Plex Mono',monospace;
+  font-size:12px;
+  color:var(--muted);
+  letter-spacing:0.05em;
+}
+.hero-meta span{color:var(--accent3);}
+.hero-cards{
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(160px,1fr));
+  gap:1rem;
+  margin-top:3rem;
+}
+.hero-card{
+  background:var(--surface);
+  border:1px solid var(--border);
+  border-radius:8px;
+  padding:1.25rem;
+  text-align:center;
+  transition:all 0.3s;
+}
+.hero-card:hover{border-color:var(--accent);transform:translateY(-3px);}
+.hero-card-num{
+  font-family:'DM Serif Display',serif;
+  font-size:2.2rem;
+  color:var(--accent);
+  display:block;
+}
+.hero-card-label{
+  font-size:11px;
+  color:var(--muted);
+  font-family:'IBM Plex Mono',monospace;
+  letter-spacing:0.05em;
+  margin-top:0.25rem;
+}
+
+/* ── SECTIONS ── */
+section{
+  position:relative;
+  z-index:1;
+  max-width:1000px;
+  margin:0 auto;
+  padding:5rem 2rem;
+}
+section + section{border-top:1px solid var(--border);}
+.sec-label{
+  font-family:'IBM Plex Mono',monospace;
+  font-size:11px;
+  color:var(--accent);
+  letter-spacing:0.12em;
+  text-transform:uppercase;
+  margin-bottom:0.75rem;
+}
+h2.sec-title{
+  font-family:'DM Serif Display',serif;
+  font-size:clamp(1.6rem,4vw,2.4rem);
+  line-height:1.2;
+  margin-bottom:1.5rem;
+  color:#f1f5f9;
+}
+.sec-intro{
+  color:var(--muted);
+  max-width:680px;
+  margin-bottom:2.5rem;
+  font-size:0.95rem;
+}
+
+/* ── FORMULA BOX ── */
+.formula-box{
+  background:var(--code-bg);
+  border:1px solid var(--accent);
+  border-radius:10px;
+  padding:2rem;
+  margin:2rem 0;
+  text-align:center;
+  position:relative;
+  overflow:hidden;
+}
+.formula-box::before{
+  content:'';
+  position:absolute;inset:0;
+  background:linear-gradient(135deg,rgba(56,189,248,0.04),transparent);
+  pointer-events:none;
+}
+.formula-text{
+  font-family:'IBM Plex Mono',monospace;
+  font-size:clamp(0.8rem,2.2vw,1.05rem);
+  color:var(--accent);
+  letter-spacing:0.02em;
+  line-height:1.6;
+}
+.formula-text .hl{color:var(--accent3);}
+.formula-text .hl2{color:var(--accent2);}
+.formula-text .hl3{color:var(--warn);}
+.formula-caption{
+  font-size:12px;
+  color:var(--muted);
+  margin-top:1rem;
+  font-style:italic;
+}
+
+/* ── TERM TABLE ── */
+.term-grid{
+  display:grid;
+  gap:0.75rem;
+  margin:2rem 0;
+}
+.term-row{
+  display:grid;
+  grid-template-columns:180px 1fr;
+  gap:1rem;
+  background:var(--surface);
+  border:1px solid var(--border);
+  border-radius:8px;
+  padding:1rem 1.25rem;
+  align-items:start;
+  transition:border-color 0.2s;
+}
+.term-row:hover{border-color:var(--accent);}
+.term-sym{
+  font-family:'IBM Plex Mono',monospace;
+  font-size:13px;
+  color:var(--accent3);
+  font-weight:600;
+}
+.term-desc{font-size:14px;color:var(--text);}
+.term-desc small{display:block;color:var(--muted);font-size:12px;margin-top:0.25rem;}
+
+/* ── WARNING CALLOUT ── */
+.callout{
+  display:flex;gap:1rem;
+  padding:1.25rem 1.5rem;
+  border-radius:8px;
+  margin:1.5rem 0;
+  font-size:14px;
+  line-height:1.6;
+}
+.callout.warn{background:rgba(251,146,60,0.08);border:1px solid rgba(251,146,60,0.3);color:#fed7aa;}
+.callout.info{background:rgba(56,189,248,0.08);border:1px solid rgba(56,189,248,0.25);color:#bae6fd;}
+.callout.success{background:rgba(52,211,153,0.08);border:1px solid rgba(52,211,153,0.25);color:#a7f3d0;}
+.callout-icon{font-size:1.2rem;flex-shrink:0;margin-top:0.1rem;}
+
+/* ── DEFECT CARDS ── */
+.defect-grid{
+  display:grid;
+  grid-template-columns:repeat(auto-fill,minmax(280px,1fr));
+  gap:1rem;
+  margin:2rem 0;
+}
+.defect-card{
+  background:var(--surface);
+  border:1px solid var(--border);
+  border-radius:10px;
+  padding:1.5rem;
+  cursor:pointer;
+  transition:all 0.25s;
+  position:relative;
+  overflow:hidden;
+}
+.defect-card::after{
+  content:'';
+  position:absolute;bottom:0;left:0;right:0;height:2px;
+  background:var(--card-color,var(--accent));
+  transform:scaleX(0);
+  transition:transform 0.25s;
+  transform-origin:left;
+}
+.defect-card:hover{border-color:var(--card-color,var(--accent));transform:translateY(-2px);}
+.defect-card:hover::after{transform:scaleX(1);}
+.defect-card.active{border-color:var(--card-color,var(--accent));background:var(--surface2);}
+.defect-card.active::after{transform:scaleX(1);}
+.dc-header{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:0.75rem;}
+.dc-name{
+  font-family:'DM Serif Display',serif;
+  font-size:1.35rem;
+  color:#f1f5f9;
+}
+.dc-charges{
+  display:flex;gap:4px;flex-wrap:wrap;justify-content:flex-end;
+}
+.charge-badge{
+  font-family:'IBM Plex Mono',monospace;
+  font-size:10px;
+  padding:2px 7px;
+  border-radius:3px;
+  border:1px solid;
+}
+.dc-desc{font-size:13px;color:var(--muted);margin-bottom:1rem;}
+.dc-formula{
+  font-family:'IBM Plex Mono',monospace;
+  font-size:12px;
+  color:var(--accent3);
+  background:var(--code-bg);
+  padding:0.5rem 0.75rem;
+  border-radius:6px;
+  border-left:3px solid var(--card-color,var(--accent));
+}
+
+/* ── DEFECT DETAIL PANEL ── */
+#defect-detail{
+  background:var(--surface2);
+  border:1px solid var(--accent);
+  border-radius:12px;
+  padding:2rem;
+  margin-top:1.5rem;
+  display:none;
+  animation:fadeIn 0.3s ease;
+}
+#defect-detail.show{display:block;}
+@keyframes fadeIn{from{opacity:0;transform:translateY(8px);}to{opacity:1;transform:translateY(0);}}
+.detail-grid{display:grid;grid-template-columns:1fr 1fr;gap:1.5rem;}
+@media(max-width:600px){.detail-grid{grid-template-columns:1fr;}}
+.detail-box{background:var(--code-bg);border-radius:8px;padding:1.25rem;}
+.detail-box h4{
+  font-family:'IBM Plex Mono',monospace;
+  font-size:11px;
+  color:var(--accent);
+  letter-spacing:0.1em;
+  text-transform:uppercase;
+  margin-bottom:0.75rem;
+}
+.detail-box p{font-size:13px;color:var(--text);line-height:1.7;}
+
+/* ── INCAR TABS ── */
+.tab-bar{
+  display:flex;gap:0.5rem;
+  flex-wrap:wrap;
+  margin-bottom:1rem;
+}
+.tab-btn{
+  font-family:'IBM Plex Mono',monospace;
+  font-size:11px;
+  padding:0.4rem 1rem;
+  border-radius:5px;
+  border:1px solid var(--border);
+  background:transparent;
+  color:var(--muted);
+  cursor:pointer;
+  transition:all 0.2s;
+  letter-spacing:0.04em;
+}
+.tab-btn.active,.tab-btn:hover{
+  background:rgba(56,189,248,0.1);
+  border-color:var(--accent);
+  color:var(--accent);
+}
+.tab-content{display:none;}
+.tab-content.active{display:block;}
+
+/* ── CODE BLOCK ── */
+.code-block{
+  background:var(--code-bg);
+  border:1px solid var(--border);
+  border-radius:10px;
+  overflow:hidden;
+  margin:1.25rem 0;
+}
+.code-header{
+  display:flex;justify-content:space-between;align-items:center;
+  padding:0.6rem 1rem;
+  background:rgba(255,255,255,0.03);
+  border-bottom:1px solid var(--border);
+}
+.code-title{
+  font-family:'IBM Plex Mono',monospace;
+  font-size:11px;
+  color:var(--muted);
+  letter-spacing:0.05em;
+}
+.copy-btn{
+  font-family:'IBM Plex Mono',monospace;
+  font-size:10px;
+  padding:3px 10px;
+  border-radius:4px;
+  border:1px solid var(--border);
+  background:transparent;
+  color:var(--muted);
+  cursor:pointer;
+  transition:all 0.2s;
+  letter-spacing:0.05em;
+}
+.copy-btn:hover{color:var(--accent);border-color:var(--accent);}
+.copy-btn.copied{color:var(--accent3);border-color:var(--accent3);}
+pre{
+  padding:1.25rem;
+  font-family:'IBM Plex Mono',monospace;
+  font-size:12.5px;
+  line-height:1.75;
+  overflow-x:auto;
+  color:#94a3b8;
+}
+pre .c{color:#445566;font-style:italic;}
+pre .k{color:var(--accent);}
+pre .v{color:var(--accent3);}
+pre .s{color:var(--accent2);}
+pre .w{color:var(--warn);}
+
+/* ── WORKFLOW TIMELINE ── */
+.timeline{
+  position:relative;
+  padding-left:2rem;
+  margin:2rem 0;
+}
+.timeline::before{
+  content:'';
+  position:absolute;left:9px;top:0;bottom:0;
+  width:2px;
+  background:linear-gradient(to bottom, var(--accent), var(--accent2), transparent);
+}
+.tl-item{
+  position:relative;
+  padding-bottom:2rem;
+  padding-left:1.5rem;
+}
+.tl-item::before{
+  content:'';
+  position:absolute;left:-1.6rem;top:5px;
+  width:12px;height:12px;
+  border-radius:50%;
+  border:2px solid var(--accent);
+  background:var(--bg);
+  transition:all 0.2s;
+}
+.tl-item:hover::before{background:var(--accent);}
+.tl-num{
+  font-family:'IBM Plex Mono',monospace;
+  font-size:10px;
+  color:var(--accent);
+  letter-spacing:0.1em;
+  margin-bottom:0.25rem;
+}
+.tl-title{
+  font-weight:500;
+  color:#f1f5f9;
+  margin-bottom:0.5rem;
+}
+.tl-desc{font-size:13px;color:var(--muted);line-height:1.6;}
+
+/* ── CHEM POT DIAGRAM (SVG) ── */
+.diagram-wrap{
+  background:var(--surface);
+  border:1px solid var(--border);
+  border-radius:12px;
+  padding:2rem;
+  margin:2rem 0;
+  display:flex;
+  flex-wrap:wrap;
+  gap:2rem;
+  align-items:center;
+}
+.diagram-wrap svg{flex:0 0 280px;}
+
+/* ── SIGN TABLE ── */
+.sign-table{width:100%;border-collapse:collapse;margin:1.5rem 0;}
+.sign-table th{
+  font-family:'IBM Plex Mono',monospace;
+  font-size:11px;
+  letter-spacing:0.06em;
+  text-transform:uppercase;
+  color:var(--accent);
+  padding:0.6rem 0.75rem;
+  border-bottom:1px solid var(--border);
+  text-align:left;
+}
+.sign-table td{
+  padding:0.65rem 0.75rem;
+  border-bottom:1px solid rgba(30,45,66,0.6);
+  font-size:13px;
+  vertical-align:top;
+}
+.sign-table tr:hover td{background:rgba(56,189,248,0.04);}
+.tag{
+  display:inline-block;
+  font-family:'IBM Plex Mono',monospace;
+  font-size:10px;
+  padding:2px 8px;
+  border-radius:3px;
+}
+.tag.plus{background:rgba(52,211,153,0.12);color:var(--accent3);border:1px solid rgba(52,211,153,0.3);}
+.tag.minus{background:rgba(248,113,113,0.12);color:var(--danger);border:1px solid rgba(248,113,113,0.3);}
+.tag.zero{background:rgba(100,116,139,0.15);color:var(--muted);border:1px solid var(--border);}
+
+/* ── SETUP STEPS ── */
+.setup-grid{
+  display:grid;
+  grid-template-columns:repeat(auto-fill,minmax(300px,1fr));
+  gap:1rem;
+  margin:2rem 0;
+}
+.setup-card{
+  background:var(--surface);
+  border:1px solid var(--border);
+  border-radius:10px;
+  padding:1.5rem;
+  transition:all 0.25s;
+  position:relative;
+}
+.setup-card:hover{border-color:var(--accent3);transform:translateY(-2px);}
+.setup-step-num{
+  font-family:'DM Serif Display',serif;
+  font-size:2.5rem;
+  color:rgba(56,189,248,0.15);
+  position:absolute;top:1rem;right:1.25rem;
+  line-height:1;
+}
+.setup-card h3{
+  font-size:15px;
+  color:#f1f5f9;
+  margin-bottom:0.5rem;
+}
+.setup-card p{font-size:13px;color:var(--muted);line-height:1.6;}
+
+/* ── REFERENCES ── */
+.ref-list{
+  display:grid;gap:0.75rem;
+  margin:1.5rem 0;
+}
+.ref-item{
+  background:var(--surface);
+  border:1px solid var(--border);
+  border-radius:8px;
+  padding:1rem 1.25rem;
+  display:grid;
+  grid-template-columns:auto 1fr;
+  gap:1rem;
+  align-items:start;
+  transition:border-color 0.2s;
+}
+.ref-item:hover{border-color:var(--accent2);}
+.ref-year{
+  font-family:'IBM Plex Mono',monospace;
+  font-size:11px;
+  color:var(--accent2);
+  white-space:nowrap;
+}
+.ref-text{font-size:13px;color:var(--text);}
+.ref-text strong{color:#f1f5f9;}
+.ref-text em{font-size:12px;color:var(--muted);}
+
+/* ── FERMI LEVEL SLIDER ── */
+.interactive-wrap{
+  background:var(--surface2);
+  border:1px solid var(--accent);
+  border-radius:12px;
+  padding:2rem;
+  margin:2rem 0;
+}
+.interactive-wrap h3{
+  font-family:'DM Serif Display',serif;
+  font-size:1.3rem;
+  color:#f1f5f9;
+  margin-bottom:0.5rem;
+}
+.interactive-wrap p{font-size:13px;color:var(--muted);margin-bottom:1.5rem;}
+.slider-row{
+  display:flex;align-items:center;gap:1rem;
+  margin-bottom:1.5rem;
+}
+.slider-row label{
+  font-family:'IBM Plex Mono',monospace;
+  font-size:12px;
+  color:var(--accent);
+  white-space:nowrap;
+  min-width:90px;
+}
+input[type=range]{
+  flex:1;
+  -webkit-appearance:none;
+  height:4px;
+  background:linear-gradient(to right,var(--accent) var(--pct,50%),var(--border) var(--pct,50%));
+  border-radius:2px;
+  outline:none;
+}
+input[type=range]::-webkit-slider-thumb{
+  -webkit-appearance:none;
+  width:16px;height:16px;
+  border-radius:50%;
+  background:var(--accent);
+  cursor:pointer;
+  border:2px solid var(--bg);
+  box-shadow:0 0 8px rgba(56,189,248,0.5);
+}
+.slider-val{
+  font-family:'IBM Plex Mono',monospace;
+  font-size:12px;
+  color:var(--accent3);
+  min-width:55px;
+  text-align:right;
+}
+#ef-canvas{width:100%;height:300px;border-radius:8px;display:block;background:var(--code-bg);}
+
+/* ── DIRECTORY TREE ── */
+.dir-tree{
+  font-family:'IBM Plex Mono',monospace;
+  font-size:12.5px;
+  line-height:2;
+  color:#64748b;
+  background:var(--code-bg);
+  border:1px solid var(--border);
+  border-radius:10px;
+  padding:1.5rem;
+  overflow-x:auto;
+}
+.dir-tree .dir{color:#94a3b8;}
+.dir-tree .file{color:var(--muted);}
+.dir-tree .hl{color:var(--accent3);}
+.dir-tree .warn{color:var(--warn);}
+
+/* ── FOOTER ── */
+footer{
+  position:relative;z-index:1;
+  border-top:1px solid var(--border);
+  padding:3rem 2rem;
+  text-align:center;
+  color:var(--muted);
+  font-size:13px;
+}
+footer a{color:var(--accent);text-decoration:none;}
+.footer-inner{max-width:700px;margin:0 auto;}
+.footer-inner p{margin:0.3rem 0;}
+
+/* ── RESPONSIVE ── */
+@media(max-width:700px){
+  .term-row{grid-template-columns:1fr;}
+  .hero-cards{grid-template-columns:repeat(2,1fr);}
+}
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <div class="nav-brand">MgO_DEFECTS.PY</div>
+  <ul class="nav-links">
+    <li><a href="#theory">Theory</a></li>
+    <li><a href="#defects">Defects</a></li>
+    <li><a href="#incar">INCAR</a></li>
+    <li><a href="#workflow">Workflow</a></li>
+    <li><a href="#setup">HPC Setup</a></li>
+    <li><a href="#refs">References</a></li>
+  </ul>
+</nav>
+
+<!-- HERO -->
+<div class="hero">
+  <div class="hero-glow"></div>
+  <div class="hero-inner">
+    <div class="hero-badge">Active Study &mdash; University of Dhaka</div>
+    <h1 class="hero-title">Defect Formation Energies<br>in Magnesium Oxide</h1>
+    <p class="hero-sub">
+      A complete first-principles DFT guide to calculating point defect formation
+      energies in MgO using VASP &mdash; vacancies, interstitials, antisites,
+      and charged states with the Freysoldt finite-size correction.
+    </p>
+    <div class="hero-meta">
+      Md. Mohiuddin &nbsp;|&nbsp; <span>Department of Physics</span> &nbsp;|&nbsp; University of Dhaka &nbsp;|&nbsp; June 2026
+    </div>
+    <div class="hero-cards">
+      <div class="hero-card">
+        <span class="hero-card-num">44</span>
+        <span class="hero-card-label">VASP Calculations</span>
+      </div>
+      <div class="hero-card">
+        <span class="hero-card-num">6</span>
+        <span class="hero-card-label">Defect Types</span>
+      </div>
+      <div class="hero-card">
+        <span class="hero-card-num">64</span>
+        <span class="hero-card-label">Atom Supercell</span>
+      </div>
+      <div class="hero-card">
+        <span class="hero-card-num">520</span>
+        <span class="hero-card-label">eV Cutoff</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- THEORY -->
+<section id="theory">
+  <div class="sec-label">01 / Theory</div>
+  <h2 class="sec-title">The Master Formula</h2>
+  <p class="sec-intro">
+    Every defect formation energy in this study is computed from this single equation.
+    Understanding each term &mdash; and its sign convention &mdash; is essential before
+    running a single VASP calculation.
+  </p>
+
+  <div class="formula-box">
+    <div class="formula-text">
+      <span class="hl">E<sup>f</sup>[X<sup>q</sup>]</span>
+      &nbsp;=&nbsp;
+      <span class="hl2">E<sub>tot</sub>[X<sup>q</sup>]</span>
+      &nbsp;&minus;&nbsp;
+      <span class="hl2">E<sub>tot</sub>[host]</span>
+      &nbsp;&minus;&nbsp;
+      <span class="hl3">&Sigma;<sub>i</sub> n<sub>i</sub>&mu;<sub>i</sub></span>
+      &nbsp;+&nbsp;
+      <span class="hl">q(E<sub>VBM</sub> + &Delta;E<sub>F</sub>)</span>
+      &nbsp;+&nbsp;
+      <span>E<sub>corr</sub></span>
+    </div>
+    <div class="formula-caption">
+      Formation energy of defect X in charge state q at Fermi level position &Delta;E<sub>F</sub> relative to the VBM
+    </div>
+  </div>
+
+  <div class="term-grid">
+    <div class="term-row">
+      <div class="term-sym">E<sub>tot</sub>[X<sup>q</sup>]</div>
+      <div class="term-desc">
+        Total DFT energy of the defect supercell in charge state q
+        <small>From VASP OUTCAR &rarr; energy(sigma&rarr;0). Use ISMEAR=-5 for final static run.</small>
+      </div>
+    </div>
+    <div class="term-row">
+      <div class="term-sym">E<sub>tot</sub>[host]</div>
+      <div class="term-desc">
+        Total DFT energy of the perfect bulk supercell (same size, no defect)
+        <small>Must use identical ENCUT, k-mesh, ISIF=2, and cell vectors as the defect cell.</small>
+      </div>
+    </div>
+    <div class="term-row">
+      <div class="term-sym">&Sigma; n<sub>i</sub>&mu;<sub>i</sub></div>
+      <div class="term-desc">
+        Chemical potential sum: energy cost/gain from exchanging atoms with external reservoir
+        <small>n<sub>i</sub> = +1 when atom added (interstitial), &minus;1 when removed (vacancy). This is the most common source of sign errors.</small>
+      </div>
+    </div>
+    <div class="term-row">
+      <div class="term-sym">q(E<sub>VBM</sub> + &Delta;E<sub>F</sub>)</div>
+      <div class="term-desc">
+        Electron chemical potential: energy of electrons exchanged with the Fermi reservoir
+        <small>E<sub>VBM</sub> from bulk OUTCAR. Scan &Delta;E<sub>F</sub> from 0 (VBM) to E<sub>gap</sub> (CBM) to get the full formation energy diagram.</small>
+      </div>
+    </div>
+    <div class="term-row">
+      <div class="term-sym">E<sub>corr</sub></div>
+      <div class="term-desc">
+        Finite-size correction (Freysoldt/FNV)
+        <small>Mandatory for q &ne; 0. Removes spurious electrostatic interaction between periodic images of the charged defect. Use pydefect after all runs.</small>
+      </div>
+    </div>
+  </div>
+
+  <div class="callout warn">
+    <div class="callout-icon">&#9888;</div>
+    <div>
+      <strong>Critical sign convention:</strong> n<sub>i</sub> is <em>positive</em> when an atom is
+      ADDED to the supercell and <em>negative</em> when REMOVED. The formula term is
+      &minus;n<sub>i</sub>&mu;<sub>i</sub>, so for a vacancy (n = &minus;1) this becomes
+      +&mu;<sub>i</sub>. Getting this backwards is the single most common error in defect calculations.
+    </div>
+  </div>
+
+  <!-- Sign table -->
+  <h3 style="font-family:'DM Serif Display',serif;font-size:1.2rem;margin:2rem 0 1rem;">Sign Convention by Defect Type</h3>
+  <table class="sign-table">
+    <thead>
+      <tr>
+        <th>Defect Type</th>
+        <th>Operation</th>
+        <th>n<sub>i</sub></th>
+        <th>Formula term &minus;n<sub>i</sub>&mu;<sub>i</sub></th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><strong>Vacancy</strong> (V_Mg)</td>
+        <td>Remove 1 Mg from supercell</td>
+        <td><span class="tag minus">n = &minus;1</span></td>
+        <td>+&mu;<sub>Mg</sub></td>
+      </tr>
+      <tr>
+        <td><strong>Interstitial</strong> (Mg<sub>i</sub>)</td>
+        <td>Add 1 Mg to supercell</td>
+        <td><span class="tag plus">n = +1</span></td>
+        <td>&minus;&mu;<sub>Mg</sub></td>
+      </tr>
+      <tr>
+        <td><strong>Antisite</strong> (Mg<sub>O</sub>)</td>
+        <td>Remove 1 O, add 1 Mg</td>
+        <td><span class="tag minus">n<sub>O</sub> = &minus;1</span> <span class="tag plus">n<sub>Mg</sub> = +1</span></td>
+        <td>+&mu;<sub>O</sub> &minus; &mu;<sub>Mg</sub></td>
+      </tr>
+      <tr>
+        <td><strong>Frenkel pair</strong> (V_Mg + Mg<sub>i</sub>)</td>
+        <td>Remove 1, add 1 (net zero)</td>
+        <td><span class="tag zero">n = 0 net</span></td>
+        <td>E<sup>f</sup> = E<sup>f</sup>[V<sub>Mg</sub>] + E<sup>f</sup>[Mg<sub>i</sub>]</td>
+      </tr>
+      <tr>
+        <td><strong>Schottky</strong> (V_Mg + V_O)</td>
+        <td>Remove 1 Mg + 1 O</td>
+        <td><span class="tag minus">n<sub>Mg</sub> = &minus;1</span> <span class="tag minus">n<sub>O</sub> = &minus;1</span></td>
+        <td>+&mu;<sub>Mg</sub> + &mu;<sub>O</sub></td>
+      </tr>
+    </tbody>
+  </table>
+
+  <!-- Chemical potential limits -->
+  <h3 style="font-family:'DM Serif Display',serif;font-size:1.2rem;margin:2.5rem 0 1rem;">Chemical Potential Limits for MgO</h3>
+  <div class="diagram-wrap">
+    <svg viewBox="0 0 260 260" xmlns="http://www.w3.org/2000/svg">
+      <defs>
+        <linearGradient id="tri" x1="0%" y1="0%" x2="100%" y2="100%">
+          <stop offset="0%" stop-color="#38bdf8" stop-opacity="0.15"/>
+          <stop offset="100%" stop-color="#818cf8" stop-opacity="0.05"/>
+        </linearGradient>
+      </defs>
+      <!-- axes -->
+      <line x1="40" y1="220" x2="220" y2="220" stroke="#1e2d42" stroke-width="1.5"/>
+      <line x1="40" y1="220" x2="40" y2="40" stroke="#1e2d42" stroke-width="1.5"/>
+      <!-- stability triangle -->
+      <polygon points="40,220 220,220 40,40" fill="url(#tri)" stroke="#38bdf8" stroke-width="1.5" stroke-dasharray="5,3"/>
+      <!-- axis labels -->
+      <text x="130" y="245" fill="#64748b" font-size="11" font-family="IBM Plex Mono" text-anchor="middle">&#x394;&#x3BC;_Mg (eV)</text>
+      <text x="18" y="130" fill="#64748b" font-size="11" font-family="IBM Plex Mono" text-anchor="middle" transform="rotate(-90,18,130)">&#x394;&#x3BC;_O (eV)</text>
+      <!-- points -->
+      <circle cx="40" cy="40" r="6" fill="#fb923c"/>
+      <text x="50" y="38" fill="#fb923c" font-size="10" font-family="IBM Plex Mono">O-rich</text>
+      <text x="50" y="51" fill="#64748b" font-size="9" font-family="IBM Plex Mono">&#x394;&#x3BC;_Mg = &#x394;Hf</text>
+      <circle cx="220" cy="220" r="6" fill="#34d399"/>
+      <text x="175" y="215" fill="#34d399" font-size="10" font-family="IBM Plex Mono">Mg-rich</text>
+      <text x="175" y="228" fill="#64748b" font-size="9" font-family="IBM Plex Mono">&#x394;&#x3BC;_O = &#x394;Hf</text>
+      <!-- constraint label -->
+      <text x="130" y="120" fill="#38bdf8" font-size="9.5" font-family="IBM Plex Mono" text-anchor="middle" transform="rotate(-44,130,120)">&#x394;&#x3BC;_Mg + &#x394;&#x3BC;_O = &#x394;Hf</text>
+      <!-- tick marks -->
+      <line x1="40" y1="220" x2="35" y2="220" stroke="#1e2d42" stroke-width="1"/>
+      <text x="28" y="224" fill="#64748b" font-size="9" font-family="IBM Plex Mono" text-anchor="end">0</text>
+      <line x1="220" y1="220" x2="220" y2="225" stroke="#1e2d42" stroke-width="1"/>
+      <text x="220" y="237" fill="#64748b" font-size="9" font-family="IBM Plex Mono" text-anchor="middle">0</text>
+    </svg>
+    <div>
+      <p style="font-size:14px;color:var(--text);margin-bottom:1rem;">
+        For MgO (binary system), only one constraint exists:<br>
+        <span style="font-family:'IBM Plex Mono',monospace;color:var(--accent);">&Delta;&mu;<sub>Mg</sub> + &Delta;&mu;<sub>O</sub> = &Delta;H<sup>f</sup>(MgO)</span>
+      </p>
+      <table class="sign-table" style="margin:0;">
+        <thead><tr><th>Limit</th><th>&Delta;&mu;<sub>Mg</sub></th><th>&Delta;&mu;<sub>O</sub></th><th>Scenario</th></tr></thead>
+        <tbody>
+          <tr><td><span style="color:var(--accent3);">Mg-rich</span></td><td>0</td><td>&Delta;H<sup>f</sup> &asymp; &minus;6.2 eV</td><td>Excess Mg metal</td></tr>
+          <tr><td><span style="color:var(--warn);">O-rich</span></td><td>&Delta;H<sup>f</sup> &asymp; &minus;6.2 eV</td><td>0</td><td>Oxidising atmosphere</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</section>
+
+<!-- DEFECTS -->
+<section id="defects">
+  <div class="sec-label">02 / Defects</div>
+  <h2 class="sec-title">Point Defect Catalogue</h2>
+  <p class="sec-intro">
+    Click any defect card to see POSCAR preparation instructions, atom counts,
+    and the exact formation energy formula for that defect type.
+  </p>
+
+  <div class="defect-grid" id="defect-grid">
+    <!-- cards injected by JS -->
+  </div>
+  <div id="defect-detail"></div>
+</section>
+
+<!-- INCAR -->
+<section id="incar">
+  <div class="sec-label">03 / INCAR Settings</div>
+  <h2 class="sec-title">Complete VASP Input Files</h2>
+  <p class="sec-intro">
+    Every INCAR for every calculation type. The universal block must appear in
+    every single calculation. Click the tabs to switch between calculation types.
+  </p>
+
+  <div class="callout info">
+    <div class="callout-icon">&#8505;</div>
+    <div>
+      <strong>Before running any calculation:</strong> complete the ENCUT convergence
+      test (400&ndash;600 eV) and k-mesh convergence test on the 2-atom primitive cell.
+      Use ENCUT=520 eV and a 4&times;4&times;4 k-mesh for the 64-atom 2&times;2&times;2 supercell
+      unless your own tests indicate otherwise.
+    </div>
+  </div>
+
+  <div class="tab-bar" id="incar-tabs">
+    <button class="tab-btn active" data-tab="universal">Universal Block</button>
+    <button class="tab-btn" data-tab="bulk-relax">Bulk Relax</button>
+    <button class="tab-btn" data-tab="bulk-static">Bulk Static</button>
+    <button class="tab-btn" data-tab="vacancy">Vacancy</button>
+    <button class="tab-btn" data-tab="interstitial">Interstitial</button>
+    <button class="tab-btn" data-tab="antisite">Antisite</button>
+    <button class="tab-btn" data-tab="charged">Charged</button>
+    <button class="tab-btn" data-tab="mg-ref">Mg Ref</button>
+    <button class="tab-btn" data-tab="o2-ref">O2 Ref</button>
+  </div>
+
+  <div id="incar-panels">
+    <!-- panels injected by JS -->
+  </div>
+</section>
+
+<!-- INTERACTIVE -->
+<section>
+  <div class="sec-label">04 / Interactive</div>
+  <h2 class="sec-title">Formation Energy Explorer</h2>
+  <p class="sec-intro">
+    Drag the Fermi level slider to see how formation energies and dominant
+    charge states change across the bandgap. Values shown are illustrative
+    &mdash; replace with your computed energies.
+  </p>
+  <div class="interactive-wrap">
+    <h3>E<sup>f</sup> vs. Fermi Level (&Delta;E<sub>F</sub>)</h3>
+    <p>MgO bandgap = 7.8 eV (experimental) &nbsp;|&nbsp; GGA-PBE underestimates to ~6.0 eV</p>
+    <div class="slider-row">
+      <label>Fermi Level</label>
+      <input type="range" id="ef-slider" min="0" max="780" value="390" oninput="updateCanvas(this.value)">
+      <span class="slider-val" id="ef-val">3.90 eV</span>
+    </div>
+    <div class="slider-row">
+      <label>Condition</label>
+      <select id="cond-select" onchange="updateCanvas(document.getElementById('ef-slider').value)"
+        style="flex:1;background:var(--code-bg);border:1px solid var(--border);color:var(--text);
+               padding:0.4rem 0.75rem;border-radius:5px;font-family:'IBM Plex Mono',monospace;font-size:12px;">
+        <option value="mg">Mg-rich</option>
+        <option value="o">O-rich</option>
+      </select>
+    </div>
+    <canvas id="ef-canvas" width="900" height="300"></canvas>
+  </div>
+</section>
+
+<!-- WORKFLOW -->
+<section id="workflow">
+  <div class="sec-label">05 / Workflow</div>
+  <h2 class="sec-title">Execution Order</h2>
+  <p class="sec-intro">
+    The calculations must be run in this order. Each step depends on the
+    previous one. The automation script handles this dependency chain automatically.
+  </p>
+
+  <div class="timeline">
+    <div class="tl-item">
+      <div class="tl-num">STEP 01</div>
+      <div class="tl-title">Convergence Tests (primitive cell)</div>
+      <div class="tl-desc">Sweep ENCUT (400&ndash;600 eV) and k-mesh (4x4x4 to 12x12x12) on the 2-atom primitive cell. Accept when &Delta;E &lt; 1 meV/atom. These values lock in for every subsequent calculation.</div>
+    </div>
+    <div class="tl-item">
+      <div class="tl-num">STEP 02</div>
+      <div class="tl-title">Bulk MgO Relaxation (ISIF=3)</div>
+      <div class="tl-desc">Full ionic + cell relaxation of the 64-atom 2&times;2&times;2 supercell. Obtain equilibrium lattice parameter. Save WAVECAR and CONTCAR. This CONTCAR becomes the starting geometry for ALL defect POSCARs.</div>
+    </div>
+    <div class="tl-item">
+      <div class="tl-num">STEP 03</div>
+      <div class="tl-title">Bulk MgO Static (NSW=0)</div>
+      <div class="tl-desc">Single-point calculation with ISMEAR=&minus;5 on the relaxed geometry. Extract E<sub>tot</sub>[host] and E<sub>VBM</sub> from OUTCAR. This is your reference energy for every defect formation energy.</div>
+    </div>
+    <div class="tl-item">
+      <div class="tl-num">STEP 04</div>
+      <div class="tl-title">Elemental References (parallel)</div>
+      <div class="tl-desc">Mg HCP bulk (ISMEAR=1, Methfessel-Paxton) and O<sub>2</sub> molecule (ISPIN=2, triplet state, 15 &Aring; vacuum box). Apply GGA overbinding correction: &mu;<sub>O</sub> = E(O<sub>2</sub>)/2 &minus; 0.36 eV.</div>
+    </div>
+    <div class="tl-item">
+      <div class="tl-num">STEP 05</div>
+      <div class="tl-title">Chemical Potential Limits</div>
+      <div class="tl-desc">Compute &Delta;H<sup>f</sup>(MgO) = E<sub>MgO</sub>/f.u. &minus; &mu;<sup>0</sup><sub>Mg</sub> &minus; &mu;<sup>0</sup><sub>O</sub>. Determine Mg-rich (&Delta;&mu;<sub>Mg</sub>=0) and O-rich (&Delta;&mu;<sub>O</sub>=0) limits.</div>
+    </div>
+    <div class="tl-item">
+      <div class="tl-num">STEP 06</div>
+      <div class="tl-title">Build Defect POSCARs</div>
+      <div class="tl-desc">Use pymatgen to create all defect supercells from the bulk CONTCAR. Vacancies (63 atoms), interstitials (65 atoms at octahedral void), antisites (64 atoms, swapped species). The automation script does this automatically.</div>
+    </div>
+    <div class="tl-item">
+      <div class="tl-num">STEP 07</div>
+      <div class="tl-title">Defect Relaxations (parallel, ISIF=2)</div>
+      <div class="tl-desc">All 38 defect relaxations run in parallel. ISIF=2 is mandatory &mdash; cell vectors must remain identical to the bulk reference. ISPIN=2 for all defects initially; check magnetisation and rerun with ISPIN=1 if ~0.</div>
+    </div>
+    <div class="tl-item">
+      <div class="tl-num">STEP 08</div>
+      <div class="tl-title">Defect Static Runs</div>
+      <div class="tl-desc">Single-point calculations on relaxed defect geometries using ISMEAR=&minus;5. WAVECAR from relaxation seeds the SCF. Extract final E<sub>tot</sub>[X<sup>q</sup>] from each OUTCAR.</div>
+    </div>
+    <div class="tl-item">
+      <div class="tl-num">STEP 09</div>
+      <div class="tl-title">FNV Finite-Size Corrections</div>
+      <div class="tl-desc">Apply Freysoldt/FNV corrections for all charged defects (q &ne; 0) using pydefect. This requires the dielectric tensor from a separate DFPT run. Corrections are typically 0.1&ndash;0.5 eV for q=&plusmn;1 in a 64-atom cell.</div>
+    </div>
+    <div class="tl-item">
+      <div class="tl-num">STEP 10</div>
+      <div class="tl-title">Post-Processing and Plots</div>
+      <div class="tl-desc">Collect all total energies. Compute E<sup>f</sup>[X<sup>q</sup>] for each defect and charge state as a function of &Delta;E<sub>F</sub>. Plot formation energy diagrams, charge transition level diagrams, and chemical potential stability triangle.</div>
+    </div>
+  </div>
+
+  <!-- Directory tree -->
+  <h3 style="font-family:'DM Serif Display',serif;font-size:1.3rem;margin:2rem 0 1rem;">Directory Structure</h3>
+  <div class="dir-tree">
+<span class="dir">MgO_defect_study/</span>
+&#x251C;&#x2500;&#x2500; <span class="dir">00_convergence/</span>
+&#x2502;   &#x251C;&#x2500;&#x2500; <span class="dir">ENCUT_test/</span>      <span class="c"># ENCUT = 400,450,500,520,550,600</span>
+&#x2502;   &#x2514;&#x2500;&#x2500; <span class="dir">kpoints_test/</span>    <span class="c"># k = 2x2x2 to 8x8x8</span>
+&#x251C;&#x2500;&#x2500; <span class="dir">01_bulk_MgO/</span>
+&#x2502;   &#x251C;&#x2500;&#x2500; <span class="hl">relax/</span>           <span class="c"># ISIF=3, full relaxation</span>
+&#x2502;   &#x2514;&#x2500;&#x2500; <span class="hl">static/</span>          <span class="c"># NSW=0, ISMEAR=-5, E_host extracted here</span>
+&#x251C;&#x2500;&#x2500; <span class="dir">02_elemental_refs/</span>
+&#x2502;   &#x251C;&#x2500;&#x2500; <span class="dir">Mg_bulk/</span>         <span class="c"># HCP Mg, ISMEAR=1</span>
+&#x2502;   &#x2514;&#x2500;&#x2500; <span class="dir">O2_molecule/</span>     <span class="c"># Spin-triplet, 15 A box</span>
+&#x251C;&#x2500;&#x2500; <span class="dir">03_defects/</span>
+&#x2502;   &#x251C;&#x2500;&#x2500; <span class="dir">V_Mg/</span>  q0/  q-1/  q-2/
+&#x2502;   &#x251C;&#x2500;&#x2500; <span class="dir">V_O/</span>   q0/  q+1/  q+2/
+&#x2502;   &#x251C;&#x2500;&#x2500; <span class="dir">Mg_i/</span>  q0/  q+1/  q+2/
+&#x2502;   &#x251C;&#x2500;&#x2500; <span class="dir">O_i/</span>   q0/  q-1/  q-2/
+&#x2502;   &#x251C;&#x2500;&#x2500; <span class="dir">Mg_O/</span>  q0/  q+1/  q+2/  q-1/
+&#x2502;   &#x2514;&#x2500;&#x2500; <span class="dir">O_Mg/</span>  q0/  q+1/  q-1/  q-2/
+&#x2514;&#x2500;&#x2500; <span class="hl">04_analysis/</span>     <span class="c"># plots and tables generated here</span>
+    &#x251C;&#x2500;&#x2500; <span class="file">run_analysis.py</span>
+    &#x251C;&#x2500;&#x2500; <span class="warn">formation_energies_Mg_rich.png</span>
+    &#x251C;&#x2500;&#x2500; <span class="warn">transition_levels_Mg_rich.png</span>
+    &#x2514;&#x2500;&#x2500; <span class="warn">chemical_potential_diagram.png</span>
+  </div>
+</section>
+
+<!-- HPC SETUP -->
+<section id="setup">
+  <div class="sec-label">06 / HPC Setup</div>
+  <h2 class="sec-title">Running on Your Own HPC Cluster</h2>
+  <p class="sec-intro">
+    This guide applies to any Linux HPC cluster with VASP installed. No specific
+    server information is included &mdash; adapt paths and module names to your system.
+  </p>
+
+  <div class="setup-grid">
+    <div class="setup-card">
+      <div class="setup-step-num">1</div>
+      <h3>Prerequisites</h3>
+      <p>You need: VASP 5.4+ or 6.x with a valid licence, PAW PBE pseudopotentials (POTCAR files), vaspkit for automated POTCAR generation, and MPI (OpenMPI or IntelMPI).</p>
+    </div>
+    <div class="setup-card">
+      <div class="setup-step-num">2</div>
+      <h3>Python Environment</h3>
+      <p>Create a conda environment with Python 3.11, pymatgen, ASE, matplotlib, and tabulate. If your cluster has no internet, use a local conda mirror or pip with cached wheels.</p>
+    </div>
+    <div class="setup-card">
+      <div class="setup-step-num">3</div>
+      <h3>NCORE Setting</h3>
+      <p>Set NCORE = sqrt(total_cores). For 40 cores: NCORE=6. For 64 cores: NCORE=8. This controls VASP's internal parallelisation and has a large impact on performance.</p>
+    </div>
+    <div class="setup-card">
+      <div class="setup-step-num">4</div>
+      <h3>Job Scheduler</h3>
+      <p>If your cluster uses SLURM: sbatch submit.sh. PBS/Torque: qsub submit.sh. LSF: bsub &lt; submit.sh. If no scheduler (standalone), run mpirun directly. The automation script auto-detects or runs directly.</p>
+    </div>
+    <div class="setup-card">
+      <div class="setup-step-num">5</div>
+      <h3>POTCAR Generation</h3>
+      <p>Use vaspkit option 103 in each calculation directory. It reads your POSCAR and selects the correct PAW PBE potential automatically. Verify ENMAX in the POTCAR matches your expected value (O: ~400 eV).</p>
+    </div>
+    <div class="setup-card">
+      <div class="setup-step-num">6</div>
+      <h3>Verify NELECT</h3>
+      <p>After the first neutral run, check: grep "NELECT" OUTCAR | head -1. Standard PAW PBE: Mg=2e, O=6e, giving 256 for a 64-atom cell. If using Mg_pv (10e), recalculate all NELECT values for charged defects.</p>
+    </div>
+  </div>
+
+  <div class="callout success">
+    <div class="callout-icon">&#10003;</div>
+    <div>
+      <strong>Automation script available:</strong> A Python script (<code>run_workflow.py</code>)
+      automates the entire workflow &mdash; building POSCARs from the CIF, writing all INCARs
+      and KPOINTS, generating POTCARs via vaspkit, launching all 44 calculations with correct
+      dependency ordering (bulk before defects, relax before static), monitoring progress every
+      30 minutes, and running post-processing automatically. Works on any Linux cluster with or
+      without a job scheduler.
+    </div>
+  </div>
+
+  <!-- Setup code -->
+  <h3 style="font-family:'DM Serif Display',serif;font-size:1.2rem;margin:2rem 0 1rem;">Quick Start Commands</h3>
+  <div class="code-block">
+    <div class="code-header">
+      <span class="code-title">bash — on your HPC cluster</span>
+      <button class="copy-btn" onclick="copyCode(this)">COPY</button>
+    </div>
+    <pre><span class="c"># 1. Create the Python environment (login node, with internet)</span>
+<span class="k">conda</span> <span class="v">create</span> -n mgo_defects python=3.11 numpy scipy matplotlib pandas -y
+<span class="k">conda</span> <span class="v">activate</span> mgo_defects
+<span class="k">pip</span> <span class="v">install</span> pymatgen ase tabulate
+
+<span class="c"># 2. Test dry-run (builds all files, no VASP launched)</span>
+<span class="k">python3</span> run_workflow.py --dry-run
+
+<span class="c"># 3. Build all input files</span>
+<span class="k">python3</span> run_workflow.py --only-setup
+
+<span class="c"># 4. Generate POTCARs using vaspkit</span>
+<span class="k">bash</span> MgO_defect_study/generate_all_potcars.sh
+
+<span class="c"># 5. Launch all 44 calculations (background, survives SSH disconnect)</span>
+<span class="k">nohup</span> python3 run_workflow.py > workflow_master.log 2>&1 &
+
+<span class="c"># 6. Watch progress</span>
+<span class="k">tail</span> -f workflow_master.log
+
+<span class="c"># 7. After completion: run analysis and generate plots</span>
+<span class="k">python3</span> run_workflow.py --only-analysis</pre>
+  </div>
+
+  <div class="callout warn">
+    <div class="callout-icon">&#9888;</div>
+    <div>
+      <strong>Finite-size corrections are not automated.</strong>
+      After all charged defect calculations finish, apply FNV corrections manually using
+      <code>pydefect</code>. This requires a separate DFPT calculation to obtain the
+      dielectric tensor (&epsilon;<sub>0</sub>). Corrections are typically 0.1&ndash;0.5 eV
+      for |q|=1 in a 64-atom cell and can be as large as 1&ndash;2 eV for |q|=2.
+    </div>
+  </div>
+</section>
+
+<!-- REFERENCES -->
+<section id="refs">
+  <div class="sec-label">07 / References</div>
+  <h2 class="sec-title">Key Literature</h2>
+  <p class="sec-intro">The minimum set of citations for a defect calculation paper using this methodology.</p>
+
+  <div class="ref-list">
+    <div class="ref-item">
+      <div class="ref-year">2004</div>
+      <div class="ref-text">
+        <strong>Van de Walle &amp; Neugebauer</strong> &mdash; First-principles calculations for defects and impurities: Applications to III-nitrides<br>
+        <em>J. Appl. Phys. 95, 3851 (2004) &mdash; The foundational framework paper. Must cite.</em>
+      </div>
+    </div>
+    <div class="ref-item">
+      <div class="ref-year">2014</div>
+      <div class="ref-text">
+        <strong>Freysoldt, Grabowski, Hickel, Neugebauer et al.</strong> &mdash; First-principles calculations for point defects in solids<br>
+        <em>Rev. Mod. Phys. 86, 253 (2014) &mdash; Comprehensive review of finite-size corrections and charge treatment.</em>
+      </div>
+    </div>
+    <div class="ref-item">
+      <div class="ref-year">2006</div>
+      <div class="ref-text">
+        <strong>Wang, Maxisch &amp; Ceder</strong> &mdash; Oxidation energies of transition metal oxides within the GGA+U framework<br>
+        <em>PRB 73, 195107 (2006) &mdash; Source of the &minus;0.36 eV/atom O<sub>2</sub> GGA overbinding correction.</em>
+      </div>
+    </div>
+    <div class="ref-item">
+      <div class="ref-year">2008</div>
+      <div class="ref-text">
+        <strong>Lany &amp; Zunger</strong> &mdash; Assessment of correction methods for the band-gap problem and for finite-size effects<br>
+        <em>PRB 78, 235104 (2008) &mdash; FNV correction scheme; shallow vs. deep defect treatment.</em>
+      </div>
+    </div>
+    <div class="ref-item">
+      <div class="ref-year">2018</div>
+      <div class="ref-text">
+        <strong>Oba &amp; Kumagai</strong> &mdash; Design and exploration of semiconductors from first principles<br>
+        <em>Appl. Phys. Express 11, 060101 (2018) &mdash; Modern guide to defect calculations with pydefect.</em>
+      </div>
+    </div>
+    <div class="ref-item">
+      <div class="ref-year">1996</div>
+      <div class="ref-text">
+        <strong>Kresse &amp; Furthmuller</strong> &mdash; Efficient iterative schemes for ab initio total-energy calculations using a plane-wave basis set<br>
+        <em>PRB 54, 11169 (1996) &mdash; Main VASP code reference.</em>
+      </div>
+    </div>
+    <div class="ref-item">
+      <div class="ref-year">1996</div>
+      <div class="ref-text">
+        <strong>Perdew, Burke &amp; Ernzerhof</strong> &mdash; Generalized gradient approximation made simple<br>
+        <em>PRL 77, 3865 (1996) &mdash; GGA-PBE functional (GGA=PE in INCAR).</em>
+      </div>
+    </div>
+    <div class="ref-item">
+      <div class="ref-year">1994</div>
+      <div class="ref-text">
+        <strong>Blochl</strong> &mdash; Projector augmented-wave method<br>
+        <em>PRB 50, 17953 (1994) &mdash; PAW method underlying all VASP pseudopotentials.</em>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-inner">
+    <p>Defect Calculations in MgO &mdash; Md. Mohiuddin</p>
+    <p>Department of Physics, University of Dhaka &mdash; June 2026</p>
+    <p style="margin-top:1rem;font-size:12px;">
+      Built with HTML/CSS/JS &mdash; hosted on GitHub Pages &mdash; no server, no tracking, no sensitive data
+    </p>
+  </div>
+</footer>
+
+<script>
+// ── DEFECT DATA
+const defects = [
+  {
+    id:"vmg", name:"V<sub>Mg</sub>", fullName:"Mg Vacancy",
+    color:"#38bdf8", charges:["0","-1","-2"],
+    desc:"One Mg atom removed from the rocksalt lattice. Creates a negatively charged centre. Dominant acceptor defect in MgO.",
+    atoms:63, sc:"Remove first Mg atom from bulk CONTCAR",
+    formula:"E<sup>f</sup> = E[V<sub>Mg</sub>] &minus; E[host] + &mu;<sub>Mg</sub> + q(E<sub>VBM</sub>+&Delta;E<sub>F</sub>)",
+    magmom:"63*0.0", poscar:"63-atom cell (64 &minus; 1 Mg)",
+    note:"Check magnetisation after run. If ~2 muB, keep ISPIN=2. If ~0, rerun with ISPIN=1."
+  },
+  {
+    id:"vo", name:"V<sub>O</sub>", fullName:"O Vacancy",
+    color:"#f87171", charges:["0","+1","+2"],
+    desc:"One O atom removed from the lattice. Creates a positively charged centre. Dominant donor in reducing conditions.",
+    atoms:63, sc:"Remove first O atom from bulk CONTCAR",
+    formula:"E<sup>f</sup> = E[V<sub>O</sub>] &minus; E[host] + &mu;<sub>O</sub> + q(E<sub>VBM</sub>+&Delta;E<sub>F</sub>)",
+    magmom:"63*0.0", poscar:"63-atom cell (64 &minus; 1 O)",
+    note:"Often a deep donor in MgO. The q=+2 F-centre is particularly stable."
+  },
+  {
+    id:"mgi", name:"Mg<sub>i</sub>", fullName:"Mg Interstitial",
+    color:"#34d399", charges:["0","+1","+2"],
+    desc:"Extra Mg atom inserted at the unoccupied octahedral void at (0.5, 0.5, 0.5) in the rocksalt structure.",
+    atoms:65, sc:"Append Mg at fractional [0.25, 0.25, 0.25] of 2x2x2 supercell",
+    formula:"E<sup>f</sup> = E[Mg<sub>i</sub>] &minus; E[host] &minus; &mu;<sub>Mg</sub> + q(E<sub>VBM</sub>+&Delta;E<sub>F</sub>)",
+    magmom:"65*0.0", poscar:"65-atom cell (64 + 1 Mg)",
+    note:"Use POTIM=0.2 (smaller step). After relaxation, visualise CONTCAR in VESTA to confirm the interstitial did not migrate to a different site."
+  },
+  {
+    id:"oi", name:"O<sub>i</sub>", fullName:"O Interstitial",
+    color:"#fb923c", charges:["0","-1","-2"],
+    desc:"Extra O atom at the octahedral interstitial void. High formation energy in most conditions.",
+    atoms:65, sc:"Append O at fractional [0.25, 0.25, 0.25] of 2x2x2 supercell",
+    formula:"E<sup>f</sup> = E[O<sub>i</sub>] &minus; E[host] &minus; &mu;<sub>O</sub> + q(E<sub>VBM</sub>+&Delta;E<sub>F</sub>)",
+    magmom:"65*0.0", poscar:"65-atom cell (64 + 1 O)",
+    note:"May form a dumbbell configuration. Check final position carefully in VESTA."
+  },
+  {
+    id:"mgo_as", name:"Mg<sub>O</sub>", fullName:"Mg Antisite",
+    color:"#818cf8", charges:["0","+1","+2","-1"],
+    desc:"Mg atom sitting on an O lattice site. Unusual bonding environment; often has significant magnetic moment.",
+    atoms:64, sc:"Replace first O atom in CONTCAR with Mg",
+    formula:"E<sup>f</sup> = E[Mg<sub>O</sub>] &minus; E[host] + &mu;<sub>O</sub> &minus; &mu;<sub>Mg</sub> + q(E<sub>VBM</sub>+&Delta;E<sub>F</sub>)",
+    magmom:"32*0.0 1*2.0 31*0.0", poscar:"64-atom cell, composition Mg<sub>33</sub>O<sub>31</sub>",
+    note:"MAGMOM: assign 2.0 muB to the Mg-on-O site. Atom ordering must match POSCAR."
+  },
+  {
+    id:"omg_as", name:"O<sub>Mg</sub>", fullName:"O Antisite",
+    color:"#a78bfa", charges:["0","+1","-1","-2"],
+    desc:"O atom sitting on a Mg lattice site. Very high formation energy; rarely thermodynamically relevant.",
+    atoms:64, sc:"Replace first Mg atom in CONTCAR with O",
+    formula:"E<sup>f</sup> = E[O<sub>Mg</sub>] &minus; E[host] + &mu;<sub>Mg</sub> &minus; &mu;<sub>O</sub> + q(E<sub>VBM</sub>+&Delta;E<sub>F</sub>)",
+    magmom:"31*0.0 1*2.0 32*0.0", poscar:"64-atom cell, composition Mg<sub>31</sub>O<sub>33</sub>",
+    note:"Adjust MAGMOM atom order to match your POSCAR site ordering."
+  }
+];
+
+// ── INCAR DATA
+const incars = {
+  "universal": {
+    title:"INCAR -- UNIVERSAL BLOCK",
+    code:`<span class="c">### === UNIVERSAL SETTINGS FOR ALL MgO CALCULATIONS ===</span>
+
+<span class="c">### Basis set</span>
+<span class="k">ENCUT</span>   = <span class="v">520</span>      <span class="c"># 1.3x ENMAX of O PAW (400 eV) -- identical in ALL calculations</span>
+<span class="k">PREC</span>    = <span class="v">Accurate</span> <span class="c"># avoids FFT wrap-around errors</span>
+
+<span class="c">### Electronic convergence</span>
+<span class="k">EDIFF</span>   = <span class="v">1E-6</span>     <span class="c"># convergence criterion [eV]</span>
+<span class="k">NELM</span>    = <span class="v">200</span>      <span class="c"># max SCF iterations</span>
+<span class="k">NELMIN</span>  = <span class="v">6</span>        <span class="c"># min SCF iterations (prevents premature exit)</span>
+
+<span class="c">### Functional</span>
+<span class="k">GGA</span>     = <span class="v">PE</span>       <span class="c"># GGA-PBE (cite PBE 1996)</span>
+
+<span class="c">### Output</span>
+<span class="k">LORBIT</span>  = <span class="v">11</span>       <span class="c"># projected DOS (needed for VBM)</span>
+<span class="k">NCORE</span>   = <span class="v">6</span>        <span class="c"># set to sqrt(total cores); e.g. sqrt(40) ~ 6</span>`
+  },
+  "bulk-relax": {
+    title:"INCAR -- bulk_MgO / relax",
+    code:`<span class="c">### === BULK MgO: FULL RELAXATION ===</span>
+<span class="k">SYSTEM</span>  = <span class="s">MgO bulk 2x2x2 supercell -- relaxation</span>
+<span class="k">ISTART</span>  = <span class="v">0</span>        <span class="c"># start from scratch</span>
+<span class="k">ICHARG</span>  = <span class="v">2</span>        <span class="c"># superposition of atomic charges</span>
+
+<span class="c">### Smearing: Gaussian for insulators during relaxation</span>
+<span class="k">ISMEAR</span>  = <span class="v">0</span>        <span class="c"># Gaussian smearing</span>
+<span class="k">SIGMA</span>   = <span class="v">0.05</span>     <span class="c"># small width for insulator [eV]</span>
+
+<span class="c">### Relaxation control</span>
+<span class="k">NSW</span>     = <span class="v">200</span>      <span class="c"># max ionic steps</span>
+<span class="k">IBRION</span>  = <span class="v">2</span>        <span class="c"># conjugate gradient</span>
+<span class="k">ISIF</span>    = <span class="v">3</span>        <span class="c"># relax: ions + cell shape + cell volume</span>
+<span class="k">EDIFFG</span>  = <span class="v">-0.02</span>    <span class="c"># max force < 0.02 eV/Ang</span>
+<span class="k">POTIM</span>   = <span class="v">0.3</span>      <span class="c"># ionic step size; reduce to 0.1 if oscillating</span>
+
+<span class="k">LWAVE</span>   = <span class="v">.TRUE.</span>   <span class="c"># save WAVECAR to seed static run</span>
+<span class="k">LCHARG</span>  = <span class="v">.TRUE.</span>`
+  },
+  "bulk-static": {
+    title:"INCAR -- bulk_MgO / static",
+    code:`<span class="c">### === BULK MgO: STATIC ENERGY EXTRACTION ===</span>
+<span class="k">SYSTEM</span>  = <span class="s">MgO bulk 2x2x2 supercell -- static</span>
+<span class="k">ISTART</span>  = <span class="v">1</span>        <span class="c"># read WAVECAR from relaxation</span>
+<span class="k">ICHARG</span>  = <span class="v">0</span>        <span class="c"># read CHGCAR</span>
+
+<span class="k">EDIFF</span>   = <span class="v">1E-8</span>     <span class="c"># tighter for accurate total energy</span>
+
+<span class="c">### Tetrahedron: most accurate for static insulators</span>
+<span class="k">ISMEAR</span>  = <span class="v">-5</span>       <span class="c"># Blochl tetrahedron method</span>
+<span class="k">SIGMA</span>   = <span class="v">0.01</span>     <span class="c"># ignored by ISMEAR=-5, set small for safety</span>
+
+<span class="k">NSW</span>     = <span class="v">0</span>        <span class="c"># single point, no ionic movement</span>
+<span class="k">IBRION</span>  = <span class="v">-1</span>       <span class="c"># no ionic update</span>
+<span class="k">ISIF</span>    = <span class="v">2</span>        <span class="c"># keep cell fixed</span>
+
+<span class="k">LWAVE</span>   = <span class="v">.FALSE.</span>
+<span class="k">LCHARG</span>  = <span class="v">.FALSE.</span>
+
+<span class="c"># Extract energy: grep "energy(sigma" OUTCAR | tail -1</span>
+<span class="c"># This is E_tot[host]</span>`
+  },
+  "vacancy": {
+    title:"INCAR -- V_Mg or V_O / relax",
+    code:`<span class="c">### === VACANCY (V_Mg or V_O) ===</span>
+<span class="k">SYSTEM</span>  = <span class="s">MgO V_Mg defect cell -- relaxation</span>
+<span class="k">ISTART</span>  = <span class="v">0</span>
+<span class="k">ICHARG</span>  = <span class="v">2</span>
+
+<span class="k">ISMEAR</span>  = <span class="v">0</span>
+<span class="k">SIGMA</span>   = <span class="v">0.05</span>
+<span class="k">EDIFF</span>   = <span class="v">1E-6</span>
+<span class="k">NELM</span>    = <span class="v">300</span>      <span class="c"># vacancies can be slow to converge</span>
+
+<span class="c">### CRITICAL: ISIF=2 -- cell vectors must NOT change</span>
+<span class="k">NSW</span>     = <span class="v">300</span>
+<span class="k">IBRION</span>  = <span class="v">2</span>
+<span class="w">ISIF</span>    = <span class="w">2</span>        <span class="c"># *** IONS ONLY -- NEVER use ISIF=3 for defect cells ***</span>
+<span class="k">EDIFFG</span>  = <span class="v">-0.02</span>
+<span class="k">POTIM</span>   = <span class="v">0.3</span>
+
+<span class="c">### Spin: vacancies can have localised unpaired electrons</span>
+<span class="k">ISPIN</span>   = <span class="v">2</span>
+<span class="k">MAGMOM</span>  = <span class="v">63*0.0</span>   <span class="c"># all atoms zero initial moment</span>
+
+<span class="k">LWAVE</span>   = <span class="v">.TRUE.</span>
+<span class="k">LCHARG</span>  = <span class="v">.TRUE.</span>
+<span class="k">LORBIT</span>  = <span class="v">11</span>`
+  },
+  "interstitial": {
+    title:"INCAR -- Mg_i or O_i / relax",
+    code:`<span class="c">### === INTERSTITIAL (Mg_i or O_i) ===</span>
+<span class="k">SYSTEM</span>  = <span class="s">MgO Mg_i interstitial defect -- relaxation</span>
+<span class="k">ISTART</span>  = <span class="v">0</span>
+<span class="k">ICHARG</span>  = <span class="v">2</span>
+
+<span class="k">ISMEAR</span>  = <span class="v">0</span>
+<span class="k">SIGMA</span>   = <span class="v">0.05</span>
+<span class="k">EDIFF</span>   = <span class="v">1E-6</span>
+<span class="k">NELM</span>    = <span class="v">300</span>
+
+<span class="k">NSW</span>     = <span class="v">400</span>      <span class="c"># interstitials need more steps</span>
+<span class="k">IBRION</span>  = <span class="v">2</span>
+<span class="w">ISIF</span>    = <span class="w">2</span>        <span class="c"># ions only -- cell fixed</span>
+<span class="k">EDIFFG</span>  = <span class="v">-0.02</span>
+<span class="k">POTIM</span>   = <span class="v">0.2</span>      <span class="c"># smaller step: interstitial site is crowded</span>
+
+<span class="k">ISPIN</span>   = <span class="v">2</span>
+<span class="k">MAGMOM</span>  = <span class="v">65*0.0</span>   <span class="c"># 65 atoms (64 + 1 interstitial)</span>
+
+<span class="k">LWAVE</span>   = <span class="v">.TRUE.</span>
+<span class="k">LCHARG</span>  = <span class="v">.TRUE.</span>
+<span class="k">LORBIT</span>  = <span class="v">11</span>
+
+<span class="c">### After run: visualise CONTCAR in VESTA to confirm interstitial position</span>`
+  },
+  "antisite": {
+    title:"INCAR -- Mg_O or O_Mg antisite / relax",
+    code:`<span class="c">### === ANTISITE (Mg_O or O_Mg) ===</span>
+<span class="k">SYSTEM</span>  = <span class="s">MgO Mg_O antisite defect -- relaxation</span>
+<span class="k">ISTART</span>  = <span class="v">0</span>
+<span class="k">ICHARG</span>  = <span class="v">2</span>
+
+<span class="k">ISMEAR</span>  = <span class="v">0</span>
+<span class="k">SIGMA</span>   = <span class="v">0.05</span>
+<span class="k">EDIFF</span>   = <span class="v">1E-6</span>
+<span class="k">NELM</span>    = <span class="v">300</span>
+
+<span class="k">NSW</span>     = <span class="v">300</span>
+<span class="k">IBRION</span>  = <span class="v">2</span>
+<span class="w">ISIF</span>    = <span class="w">2</span>        <span class="c"># ions only</span>
+<span class="k">EDIFFG</span>  = <span class="v">-0.02</span>
+<span class="k">POTIM</span>   = <span class="v">0.3</span>
+
+<span class="c">### Antisites often have large magnetic moments</span>
+<span class="k">ISPIN</span>   = <span class="v">2</span>
+<span class="k">MAGMOM</span>  = <span class="v">31*0.0 1*2.0 32*0.0</span>  <span class="c"># 1 Mg on O site: 2 muB initial</span>
+<span class="c"># Adjust MAGMOM order to match POSCAR atom ordering</span>
+
+<span class="k">LWAVE</span>   = <span class="v">.TRUE.</span>
+<span class="k">LCHARG</span>  = <span class="v">.TRUE.</span>
+<span class="k">LORBIT</span>  = <span class="v">11</span>`
+  },
+  "charged": {
+    title:"INCAR -- charged defect (additional block)",
+    code:`<span class="c">### === CHARGED DEFECT: add this block to the neutral INCAR ===</span>
+
+<span class="c">### Find default NELECT from neutral run:</span>
+<span class="c">### grep 'NELECT' neutral_run/OUTCAR | head -1</span>
+<span class="c">###</span>
+<span class="c">### Rule: NELECT = default_NELECT - q</span>
+<span class="c">###   q = -1 (acceptor, add electron):  NELECT = default + 1</span>
+<span class="c">###   q = +1 (donor, remove electron):  NELECT = default - 1</span>
+<span class="c">###   q = -2:                           NELECT = default + 2</span>
+<span class="c">###</span>
+<span class="c">### Example for V_Mg q=-1 in 64-atom cell (default=256):</span>
+<span class="w">NELECT</span>  = <span class="w">257</span>      <span class="c"># q=-1: 256 + 1</span>
+
+<span class="c">### Dipole correction for charged cells</span>
+<span class="k">LDIPOL</span>  = <span class="v">.TRUE.</span>
+<span class="k">IDIPOL</span>  = <span class="v">4</span>        <span class="c"># correct in all directions</span>
+
+<span class="c">### Apply FNV finite-size correction AFTER the run using pydefect</span>
+<span class="c">### Do NOT forget this step -- charged defect energies without</span>
+<span class="c">### correction can be 0.5-2.0 eV off for |q| >= 1</span>`
+  },
+  "mg-ref": {
+    title:"INCAR -- Mg_bulk_ref",
+    code:`<span class="c">### === Mg HCP BULK REFERENCE ===</span>
+<span class="k">SYSTEM</span>  = <span class="s">Mg HCP bulk reference for chemical potential</span>
+<span class="k">ISTART</span>  = <span class="v">0</span>
+<span class="k">ICHARG</span>  = <span class="v">2</span>
+<span class="k">EDIFF</span>   = <span class="v">1E-8</span>     <span class="c"># tight: this is a reference energy</span>
+
+<span class="c">### Metal: Methfessel-Paxton smearing</span>
+<span class="k">ISMEAR</span>  = <span class="v">1</span>        <span class="c"># Methfessel-Paxton order 1 -- correct for metals</span>
+<span class="k">SIGMA</span>   = <span class="v">0.2</span>      <span class="c"># wider smearing for metallic Fermi surface</span>
+
+<span class="k">NSW</span>     = <span class="v">100</span>
+<span class="k">IBRION</span>  = <span class="v">2</span>
+<span class="k">ISIF</span>    = <span class="v">3</span>        <span class="c"># full relax for reference geometry</span>
+<span class="k">EDIFFG</span>  = <span class="v">-0.01</span>   <span class="c"># tight ionic convergence for reference</span>
+
+<span class="k">LWAVE</span>   = <span class="v">.FALSE.</span>
+<span class="k">LCHARG</span>  = <span class="v">.FALSE.</span>`
+  },
+  "o2-ref": {
+    title:"INCAR -- O2_molecule_ref",
+    code:`<span class="c">### === O2 MOLECULE REFERENCE ===</span>
+<span class="c">### POSCAR: 2 O atoms in a 15x15x15 Ang vacuum box</span>
+<span class="c">### O-O bond length initial guess: 1.24 Ang</span>
+<span class="k">SYSTEM</span>  = <span class="s">O2 molecule reference</span>
+<span class="k">ISTART</span>  = <span class="v">0</span>
+<span class="k">ICHARG</span>  = <span class="v">2</span>
+<span class="k">EDIFF</span>   = <span class="v">1E-8</span>
+
+<span class="k">ISMEAR</span>  = <span class="v">0</span>        <span class="c"># Gaussian: molecule has discrete states</span>
+<span class="k">SIGMA</span>   = <span class="v">0.01</span>     <span class="c"># narrow smearing for molecule</span>
+
+<span class="c">### MANDATORY: O2 is a spin triplet (S=1, 2 unpaired electrons)</span>
+<span class="w">ISPIN</span>   = <span class="w">2</span>        <span class="c"># NOT OPTIONAL -- wrong spin gives wrong energy</span>
+<span class="w">MAGMOM</span>  = <span class="w">1 1</span>      <span class="c"># 1 muB per O atom -- allows triplet state</span>
+
+<span class="k">NSW</span>     = <span class="v">100</span>
+<span class="k">IBRION</span>  = <span class="v">2</span>
+<span class="k">ISIF</span>    = <span class="v">2</span>        <span class="c"># relax bond length only, vacuum box fixed</span>
+<span class="k">EDIFFG</span>  = <span class="v">-0.01</span>
+
+<span class="c">### Dipole correction: molecule in periodic box has image dipoles</span>
+<span class="k">LDIPOL</span>  = <span class="v">.TRUE.</span>
+<span class="k">IDIPOL</span>  = <span class="v">4</span>
+
+<span class="k">LWAVE</span>   = <span class="v">.FALSE.</span>
+<span class="k">LCHARG</span>  = <span class="v">.FALSE.</span>
+
+<span class="c">### After run: apply GGA overbinding correction</span>
+<span class="c">### mu_O(corrected) = E(O2)/2 - 0.36 eV  (Wang et al. PRB 2006)</span>`
+  }
+};
+
+// ── BUILD DEFECT CARDS
+const grid = document.getElementById('defect-grid');
+defects.forEach(d => {
+  const card = document.createElement('div');
+  card.className = 'defect-card';
+  card.style.setProperty('--card-color', d.color);
+  card.innerHTML = `
+    <div class="dc-header">
+      <div class="dc-name">${d.name}</div>
+      <div class="dc-charges">
+        ${d.charges.map(c => `<span class="charge-badge" style="color:${d.color};border-color:${d.color}30">${c === '0' ? 'q=0' : 'q='+c}</span>`).join('')}
+      </div>
+    </div>
+    <div class="dc-desc">${d.desc}</div>
+    <div class="dc-formula">${d.formula}</div>
+  `;
+  card.onclick = () => showDefect(d, card);
+  grid.appendChild(card);
+});
+
+function showDefect(d, card) {
+  document.querySelectorAll('.defect-card').forEach(c => c.classList.remove('active'));
+  card.classList.add('active');
+  const panel = document.getElementById('defect-detail');
+  panel.classList.add('show');
+  panel.innerHTML = `
+    <h3 style="font-family:'DM Serif Display',serif;font-size:1.4rem;color:#f1f5f9;margin-bottom:1.25rem;">
+      ${d.fullName} &mdash; <span style="color:${d.color}">${d.name}</span>
+    </h3>
+    <div class="detail-grid">
+      <div class="detail-box">
+        <h4>POSCAR Preparation</h4>
+        <p><strong>Cell:</strong> ${d.poscar}<br>
+        <strong>Step:</strong> ${d.sc}<br><br>
+        Use pymatgen or VESTA to build the defect cell from the bulk CONTCAR (after bulk relaxation).</p>
+      </div>
+      <div class="detail-box">
+        <h4>INCAR Key Tags</h4>
+        <p><code style="color:var(--warn);">ISIF = 2</code> &mdash; mandatory for all defect cells<br>
+        <code style="color:var(--accent3);">ISPIN = 2</code> &mdash; always test spin-polarised<br>
+        <code style="color:var(--accent);">MAGMOM = ${d.magmom}</code></p>
+      </div>
+      <div class="detail-box">
+        <h4>Formation Energy Formula</h4>
+        <p style="font-family:'IBM Plex Mono',monospace;font-size:12px;line-height:1.8;color:var(--accent3);">${d.formula}</p>
+      </div>
+      <div class="detail-box">
+        <h4>Practical Notes</h4>
+        <p>${d.note}</p>
+      </div>
+    </div>
+  `;
+  panel.scrollIntoView({behavior:'smooth', block:'nearest'});
+}
+
+// ── BUILD INCAR PANELS
+const panelsDiv = document.getElementById('incar-panels');
+Object.entries(incars).forEach(([key, data]) => {
+  const div = document.createElement('div');
+  div.className = 'tab-content' + (key === 'universal' ? ' active' : '');
+  div.id = 'tab-' + key;
+  div.innerHTML = `
+    <div class="code-block">
+      <div class="code-header">
+        <span class="code-title">${data.title}</span>
+        <button class="copy-btn" onclick="copyCode(this)">COPY</button>
+      </div>
+      <pre>${data.code}</pre>
+    </div>
+  `;
+  panelsDiv.appendChild(div);
+});
+
+// ── TAB SWITCHING
+document.getElementById('incar-tabs').addEventListener('click', e => {
+  const btn = e.target.closest('.tab-btn');
+  if (!btn) return;
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+  btn.classList.add('active');
+  document.getElementById('tab-' + btn.dataset.tab).classList.add('active');
+});
+
+// ── COPY CODE
+function copyCode(btn) {
+  const pre = btn.closest('.code-block').querySelector('pre');
+  const text = pre.innerText;
+  navigator.clipboard.writeText(text).then(() => {
+    btn.textContent = 'COPIED';
+    btn.classList.add('copied');
+    setTimeout(() => { btn.textContent = 'COPY'; btn.classList.remove('copied'); }, 2000);
+  });
+}
+
+// ── SLIDER STYLE UPDATE
+document.getElementById('ef-slider').addEventListener('input', function() {
+  const pct = (this.value / this.max * 100).toFixed(1);
+  this.style.setProperty('--pct', pct + '%');
+});
+
+// ── FORMATION ENERGY CANVAS
+const EG = 7.8;
+const EF_POINTS = 300;
+
+// Illustrative formation energy parameters [name, color, slopes by charge, intercepts by charge (Mg-rich)]
+const EF_DATA = [
+  { name:'V_Mg',  color:'#38bdf8', qs:[0,-1,-2], a_mg:[6.8,5.8,4.8],  a_or:[0.8,  -0.2, -1.2] },
+  { name:'V_O',   color:'#f87171', qs:[0, 1, 2], a_mg:[4.1,3.1,2.1],  a_or:[10.1, 9.1,  8.1]  },
+  { name:'Mg_i',  color:'#34d399', qs:[0, 1, 2], a_mg:[8.2,7.2,6.2],  a_or:[2.2,  1.2,  0.2]  },
+  { name:'O_i',   color:'#fb923c', qs:[0,-1,-2], a_mg:[11.5,10.5,9.5], a_or:[5.5,  4.5,  3.5] },
+  { name:'Mg_O',  color:'#818cf8', qs:[0, 1,-1], a_mg:[14.0,13.0,15.0],a_or:[8.0,  7.0,  9.0] },
+  { name:'O_Mg',  color:'#a78bfa', qs:[0, 1,-1], a_mg:[15.0,14.0,16.0],a_or:[9.0,  8.0,  10.0]},
+];
+
+function updateCanvas(val) {
+  const ef = val / 100;
+  document.getElementById('ef-val').textContent = ef.toFixed(2) + ' eV';
+  const range = document.getElementById('ef-slider');
+  range.style.setProperty('--pct', (val / range.max * 100).toFixed(1) + '%');
+
+  const canvas = document.getElementById('ef-canvas');
+  const W = canvas.clientWidth; const H = canvas.clientHeight;
+  canvas.width = W * window.devicePixelRatio;
+  canvas.height = H * window.devicePixelRatio;
+  const ctx = canvas.getContext('2d');
+  ctx.scale(window.devicePixelRatio, window.devicePixelRatio);
+
+  const isO = document.getElementById('cond-select').value === 'o';
+  const PAD = {l:55, r:20, t:20, b:45};
+  const pw = W - PAD.l - PAD.r;
+  const ph = H - PAD.t - PAD.b;
+
+  ctx.clearRect(0,0,W,H);
+  ctx.fillStyle = '#0d1520';
+  ctx.fillRect(0,0,W,H);
+
+  // grid
+  ctx.strokeStyle = '#1e2d42';
+  ctx.lineWidth = 0.5;
+  for(let i=0;i<=8;i++){
+    const x = PAD.l + i*pw/8;
+    ctx.beginPath(); ctx.moveTo(x,PAD.t); ctx.lineTo(x,PAD.t+ph); ctx.stroke();
+  }
+  for(let i=0;i<=6;i++){
+    const y = PAD.t + i*ph/6;
+    ctx.beginPath(); ctx.moveTo(PAD.l,y); ctx.lineTo(PAD.l+pw,y); ctx.stroke();
+  }
+
+  // axes
+  ctx.strokeStyle = '#334155'; ctx.lineWidth = 1;
+  ctx.beginPath(); ctx.moveTo(PAD.l,PAD.t); ctx.lineTo(PAD.l,PAD.t+ph); ctx.stroke();
+  ctx.beginPath(); ctx.moveTo(PAD.l,PAD.t+ph); ctx.lineTo(PAD.l+pw,PAD.t+ph); ctx.stroke();
+
+  // axis zero line
+  const yZero = PAD.t + ph * 8/12;
+  ctx.strokeStyle = '#475569'; ctx.lineWidth = 0.8;
+  ctx.setLineDash([4,3]);
+  ctx.beginPath(); ctx.moveTo(PAD.l,yZero); ctx.lineTo(PAD.l+pw,yZero); ctx.stroke();
+  ctx.setLineDash([]);
+
+  // Fermi level line
+  const xEf = PAD.l + (ef/EG) * pw;
+  ctx.strokeStyle = 'rgba(56,189,248,0.6)'; ctx.lineWidth = 1.5;
+  ctx.setLineDash([3,3]);
+  ctx.beginPath(); ctx.moveTo(xEf,PAD.t); ctx.lineTo(xEf,PAD.t+ph); ctx.stroke();
+  ctx.setLineDash([]);
+
+  const EF_MAX = 4;
+  const EF_MIN = -2;
+  const EF_RANGE = EF_MAX - EF_MIN;
+
+  function yPos(ef_val) {
+    return PAD.t + ph * (1 - (ef_val - EF_MIN) / EF_RANGE);
+  }
+  function xPos(fermi) {
+    return PAD.l + (fermi / EG) * pw;
+  }
+
+  // plot each defect envelope
+  EF_DATA.forEach(d => {
+    const intercepts = isO ? d.a_or : d.a_mg;
+    const fermiArr = Array.from({length:EF_POINTS}, (_,i) => i/(EF_POINTS-1)*EG);
+
+    // compute min envelope
+    const envArr = fermiArr.map(f => {
+      let min = Infinity;
+      d.qs.forEach((q,idx) => {
+        const val = intercepts[idx] + q * f;
+        if (val < min) min = val;
+      });
+      return min;
+    });
+
+    ctx.beginPath();
+    ctx.strokeStyle = d.color;
+    ctx.lineWidth = 2;
+    fermiArr.forEach((f,i) => {
+      const x = xPos(f); const y = yPos(envArr[i]);
+      i === 0 ? ctx.moveTo(x,y) : ctx.lineTo(x,y);
+    });
+    ctx.stroke();
+
+    // label at EF=3.9
+    const midIdx = Math.floor(EF_POINTS/2);
+    const lx = xPos(fermiArr[midIdx]);
+    const ly = yPos(envArr[midIdx]);
+    if (ly > PAD.t + 8 && ly < PAD.t + ph - 8) {
+      ctx.fillStyle = d.color;
+      ctx.font = '11px IBM Plex Mono';
+      ctx.fillText(d.name, lx + 4, ly - 4);
+    }
+  });
+
+  // axis labels
+  ctx.fillStyle = '#64748b';
+  ctx.font = '11px IBM Plex Mono';
+  ctx.textAlign = 'center';
+  for(let i=0;i<=8;i++){
+    const f = (i/8*EG).toFixed(1);
+    ctx.fillText(f, PAD.l + i*pw/8, PAD.t+ph+16);
+  }
+  ctx.fillText('Fermi energy (eV, rel. VBM)', PAD.l + pw/2, PAD.t+ph+36);
+
+  ctx.textAlign = 'right';
+  for(let i=0;i<=6;i++){
+    const v = (EF_MAX - i*EF_RANGE/6).toFixed(0);
+    ctx.fillText(v, PAD.l-8, PAD.t + i*ph/6 + 4);
+  }
+  ctx.save();
+  ctx.translate(14, PAD.t + ph/2);
+  ctx.rotate(-Math.PI/2);
+  ctx.textAlign = 'center';
+  ctx.fillText('Ef (eV)', 0, 0);
+  ctx.restore();
+
+  // condition label
+  ctx.fillStyle = isO ? '#fb923c' : '#34d399';
+  ctx.textAlign = 'left';
+  ctx.font = 'bold 11px IBM Plex Mono';
+  ctx.fillText(isO ? 'O-rich' : 'Mg-rich', PAD.l + 6, PAD.t + 16);
+
+  // EF marker
+  ctx.fillStyle = '#38bdf8';
+  ctx.textAlign = 'center';
+  ctx.font = '10px IBM Plex Mono';
+  ctx.fillText('EF = ' + ef.toFixed(2) + ' eV', xEf, PAD.t + 10);
+}
+
+window.addEventListener('resize', () => updateCanvas(document.getElementById('ef-slider').value));
+updateCanvas(390);
+
+// ── SMOOTH NAV ACTIVE STATE
+const sections = document.querySelectorAll('section[id]');
+const navLinks = document.querySelectorAll('.nav-links a');
+const observer = new IntersectionObserver(entries => {
+  entries.forEach(e => {
+    if (e.isIntersecting) {
+      navLinks.forEach(a => {
+        a.style.color = a.getAttribute('href') === '#' + e.target.id
+          ? 'var(--accent)' : '';
+      });
+    }
+  });
+}, {threshold:0.3});
+sections.forEach(s => observer.observe(s));
+</script>
+</body>
+</html>
